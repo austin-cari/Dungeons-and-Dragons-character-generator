@@ -1,0 +1,152 @@
+import java.util.Random;
+
+public class Character {
+	
+	//Character-defining traits 
+	String name;
+	String race;
+	int level;
+	int HP;
+	int alignment;			
+	
+	//ability scores
+	int strength;					
+	int dexterity;
+	int constitution;
+	int intelligence;
+	int wisdom;
+	int charisma;
+	
+	//ability score modifiers
+	int STRmod;
+	int DEXmod;
+	int CONmod;
+	int INTmod;
+	int WISmod;
+	int CHRmod;
+	
+	public Character() {
+		name = "Bob";
+		level = 1;
+		HP = 5;
+		alignment = (int) (1 + (Math.random()*8));
+		strength = 8;
+		dexterity = 8;
+		constitution = 8;
+		intelligence = 8;
+		wisdom = 8;
+		charisma = 8;
+		this.setAbilityScores();
+		this.setModifiers();
+	}
+	
+	public void setAbilityScores() {
+		int[] abilityScores = new int[] {strength, dexterity, constitution, intelligence, wisdom, charisma};
+		
+		for(int n = 0; n < 27; n++) {					      // (8*6) + 27 = 75 total ability score points
+			Random rand = new Random();
+			int i = rand.nextInt(6);					        // Grabs a random integer between 0-5
+			abilityScores[i] = abilityScores[i] + 1;	// Assign a point to the randomly selected score
+		}
+		strength = abilityScores[0];					      //Reassigns ability scores to their new, randomly
+		dexterity = abilityScores[1];					      //selected values
+		constitution = abilityScores[2];
+		intelligence = abilityScores[3];
+		wisdom = abilityScores[4];
+		charisma = abilityScores[5];
+	}
+	
+	public void setModifiers() {
+		int[] abilityScores = new int[] {strength, dexterity, constitution, intelligence, wisdom, charisma};
+		int[] abilityModifiers = new int[] {STRmod, DEXmod, CONmod, INTmod, WISmod, CHRmod};
+		
+		for(int n = 0; n < 6; n++) {
+			int score = abilityScores[n];		  //Create a reference to the ability score outside the array
+			if (score == 8 || score == 9) {		//Score of 8-9 creates a mod of -1
+				abilityModifiers[n] = -1;
+			}
+			if (score == 10 || score == 11) {	//Score of 10-11 creates a mod of +0
+				abilityModifiers[n] = 0;
+			}
+			if (score == 12 || score == 13) {	//Score of 12-13 creates a mod of +1
+				abilityModifiers[n] = 1;
+			}
+			if (score == 14 || score == 15) {	//Score of 14-15 creates a mod of +2
+				abilityModifiers[n] = 2;
+			}
+			if (score == 16 || score == 17) {	//Score of 16-17 creates a mod of +3
+				abilityModifiers[n] = 3;
+			}
+			if (score == 18 || score == 19) {	//Score of 18-19 creates a mod of +4
+				abilityModifiers[n] = 4;
+			}
+		}
+	}
+	
+	/********************************************
+	 ************ 	Get functions	  *************			
+	 *******************************************/
+	
+	public String getName() {
+		return name;
+	}
+	
+	public int getAlignment() {
+		return alignment;
+	}
+	
+	public int getLevel() {
+		return level;
+	}
+	
+	public int getHP() {
+		return HP;
+	}
+	
+	public int getStrength() {
+		return strength;
+	}
+	
+	public int getDexterity() {
+		return dexterity;
+	}
+	
+	public int getConstitution() {
+		return constitution;
+	}
+	
+	public int getIntelligence() {
+		return intelligence;
+	}
+	
+	public int getWisdom() {
+		return wisdom;
+	}
+	
+	public int getCharisma() {
+		return charisma;
+	}
+	
+	/********************************************
+	 ************ 	Main function	  *************			
+	 *******************************************/
+	
+	public static void main(String[] args) {
+		
+		Character bob = new Character();
+		System.out.println("Name: " + bob.getName());
+		System.out.println("Alignment: " + bob.getAlignment());
+		System.out.println("Level: " + bob.getLevel());
+		System.out.println("HP: " + bob.getHP());
+		System.out.println("Strength: " + bob.getStrength());
+		System.out.println("Dexterity: " + bob.getDexterity());
+		System.out.println("Constitution: " + bob.getConstitution());
+		System.out.println("Intelligence: " + bob.getIntelligence());
+		System.out.println("Wisdom: " + bob.getWisdom());
+		System.out.println("Charisma: " + bob.getCharisma());
+		}
+	
+}
+
+
+
