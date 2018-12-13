@@ -5,7 +5,9 @@ public class Character {
 	
 	//Character-defining traits 
 	String name;
+	String surname;
 	String race;
+	String gender;
 	int level;
 	int HP;
 	int alignment;			
@@ -26,7 +28,7 @@ public class Character {
 	int WISmod;
 	int CHRmod;
 	
-	public Character(int l) {
+	public Character() {
 		
 		//Base ability scores set to 8 to ensure characters aren't complete morons in certain areas
 		strength = 8;
@@ -39,6 +41,25 @@ public class Character {
 		this.setModifiers();
 		this.setRace();
 		name = "Bob";
+		level = 1;
+		HP = 5 * level;
+		alignment = (int) (1 + (Math.random()*8));
+	}
+
+	public Character(int l) {
+		
+		//Base ability scores set to 8 to ensure characters aren't complete morons in certain areas
+		strength = 8;
+		dexterity = 8;
+		constitution = 8;
+		intelligence = 8;
+		wisdom = 8;
+		charisma = 8;
+		this.assignAbilityScores();
+		this.setModifiers();
+		this.setRace();
+		this.getRandomGender();
+		this.getRandomName();
 		level = l;
 		HP = 5 * level;
 		alignment = (int) (1 + (Math.random()*8));
@@ -85,14 +106,119 @@ public class Character {
 				abilityModifiers[n] = 4;
 			}
 		}
+		
+		STRmod = abilityModifiers[0];
+		DEXmod = abilityModifiers[1];
+		CONmod = abilityModifiers[2];
+		INTmod = abilityModifiers[3];
+		WISmod = abilityModifiers[4];
+		CHRmod = abilityModifiers[5];
 	}
 	
 	public void setRace() {
-		String[] possibleRaces = new String[] {"Human", "Elf", "Dwarf", "Gnome", "Halfling", "Half-Elf", "Half-Orc"};
+		String[] possibleRaces = new String[] {"Human", "Elf", "Dwarf"};
 		Random rand = new Random();
-		int i = rand.nextInt(7);
+		int i = rand.nextInt(3);
 		race = possibleRaces[i];
 	}
+	
+	public void getRandomName() {
+		String[] maleHumanNames = new String[] {"Axel", "Ander", "Adam", "Bernard", "Bertram", "Chen", "Diggery", "Dante", "Evendur", "Francis", "Gilbert",
+												"Grim", "Henry", "Homer", "Igor", "Jiang", "Jaques", "Kane", "Leonard", "Lukas", "Luther", "Meliodas", "Mark",
+												"Murray", "Norman", "Nicholas", "Otto", "Otis", "Phillipe", "Percival", "Peter", "Quincy", "Ralph", "Robert",
+												"Rudolph", "Simon", "Sigma", "Silas", "Toby", "Thomas", "Tobias", "Uther", "Ulric", "Valentine", "Velen",
+												"Wally", "William", "Willhelm", "Wolfgang", "Xavier", "Xander", "Yusef", "Zackary", "Zashier"};
+		
+		String[] femaleHumanNames = new String[] {"Aubrey", "Agatha", "Annie", "Bertrude", "Bertha", "Beatrice", "Claudia", "Caitlyn", "Calipsa", "Denny", 
+												  "Daisy", "Dorthy", "Evelynn", "Elenore", "Elizabeth", "Eva", "Faith", "Getrude", "Gina", "Gensis", "Haspen",
+												  "Helen", "Helena", "Isabelle", "Ivanka", "Izumu", "Jackie", "Jasmine", "Jade", "Kathy", "Kathrine", "Kara",
+												  "Laney", "Laquisha", "Lucia", "Mary", "Michelle", "Matilda", "Nya", "Nikki", "Natasha", "Nyoki", "Natsuki",
+												  "Olga", "Ora", "Olma", "Pauline", "Penny", "Pandora", "Quinn", "Rachel", "Ronda", "Ren", "Sokara", "Saki",
+												  "Simiko", "Tabatha", "Tammy", "Tara", "Ursala", "Usagai", "Valentine", "Valora", "Valerie", "Wilma", "Winnie",
+												  "Willow", "Xena", "Yuriko", "Yuri", "Yolanda", "Yona", "Zelda", "Zamora"};
+		
+		String[] humanSurnames = new String[] {"Amblecrown", "Bump", "Cari", "Davis", "Edwards", "Flores", "Griffin", "Hilton", "Ivanwood", "Jassan", "Khalid",
+												"Moore", "Murnythera", "Mostana", "Nemestek", "Osyris", "Orion", "Pashar", "Perez", "Quill", "Richardson", 
+												"Rodriguez", "Shin", "Smith", "Thompson", "Ulmonika", "Van", "Willhelm", "Walker", "Yursof", "Zephyr"};
+		
+		String[] maleDwarfNames = new String[] {"Nordak", "Olunt", "Kildrak", "Duergraf", "Adrik", "Baern", "Brottor", "Bruenor", "Fargrim", "Harberk", "Doran",
+												"Travok", "Orsik", "Flint", "Rurik", "Thorin", "Ulfgar", "Vondal"};
+		
+		String[] femaleDwarfNames = new String[] {"Amber", "Artin", "Audhild", "Dagnal", "Eldeth", "Finellen", "Gunndola", "Gurdis", "Helja", "Kathra", "Ilde",
+												"Kristryd", "Mardred", "Riswynn", "Torbera", "Vistra"};
+		
+		String[] dwarfSurnames = new String[] {"Balderk", "Battlehammer", "Brawnanvil", "Dankil", "Fireforge", "Frostbeard", "Gorunn", "Ironfist", "Loderr", 
+												"Lutgehr", "Rumnaheim", "Torunn", "Ungart"};
+		
+		String[] maleElfNames = new String[] {"Adran", "Aramil", "Aust" , "Erevan" , "Fivin" , "Galinndan", "Gennal" , "Halimath", "Hiimo", "Immeral", "Korfel",
+												"Lamlis", "Quarion", "Rolen", "Theren", "Theriatis", "Uthemar"};
+
+		String[] femaleElfNames = new String[] {"Arara", "Amastrianna", "Antinua", "Birel", "Caelynn", "Chaedi", "Dara", "Drusilia", "Elama", "Enna", "Hatae",
+												"Lelenia", "Keyleth"};
+		
+		String[] elfSurnames = new String[] {"Amakiir", "Berevean", "Caerdnel", "Casilltenirra", "Cithreth", "Dalanthan", "Mystralath", "Ofandrus", "Ostoroth",
+											"Othronus", "Qualianthri", "Sylvaranth", "Raethran", "Liadon", "Lathalas"};
+		
+		Random rand = new Random();
+		
+		//If you are a human
+		if(race == "Human") {
+			int bound = humanSurnames.length;				//Creates a variable that will make sure to pick a name within array bounds
+			int i = rand.nextInt(bound);					//picks a random name
+			surname = humanSurnames[i];						//initializes your surname
+			if(gender == "Male") {							//If male, picks a male name
+				int bound2 = maleHumanNames.length;			//makes sure to pick within bounds of array
+				int i2 = rand.nextInt(bound2);				//picks a random name
+				name = maleHumanNames[i2];					//initializes your name
+			}
+			else {											//Female human
+				int bound3 = femaleHumanNames.length;
+				int i3 = rand.nextInt(bound3);
+				name = femaleHumanNames[i3];
+			}	
+		}
+		if(race == "Elf") {									//Elves
+			int bound = elfSurnames.length;
+			int i = rand.nextInt(bound);
+			surname = elfSurnames[i];
+			if(gender == "Male") {							//Male elves
+				int bound2 = maleElfNames.length;
+				int i2 = rand.nextInt(bound2);
+				name = maleElfNames[i2];
+			}
+			else {											//Female Elves
+				int bound3 = femaleElfNames.length;
+				int i3 = rand.nextInt(bound3);
+				name = femaleElfNames[i3];
+			}	
+		}
+		if(race == "Dwarf") {								//Dwarves
+			int bound = dwarfSurnames.length;
+			int i = rand.nextInt(bound);
+			surname = dwarfSurnames[i];
+			if(gender == "Male") {							//Male dwarves
+				int bound2 = maleDwarfNames.length;
+				int i2 = rand.nextInt(bound2);
+				name = maleDwarfNames[i2];
+			}
+			else {											//Female dwarves
+				int bound3 = femaleDwarfNames.length;
+				int i3 = rand.nextInt(bound3);
+				name = femaleDwarfNames[i3];
+			}	
+		}
+	}
+		
+		public void getRandomGender() {
+			Random rand = new Random();
+			int i = rand.nextInt(1);
+			if(i == 0) {
+				gender = "Male";
+			}
+			else {
+				gender = "Female";
+			}
+		}
 	
 	/********************************************
 	 ************ 	Get functions	*************			
@@ -102,8 +228,16 @@ public class Character {
 		return name;
 	}
 	
+	public String getSurname() {
+		return surname;
+	}
+	
 	public String getRace() {
 		return race;
+	}
+	
+	public String getGender() {
+		return gender;
 	}
 	
 	public int getAlignment() {
@@ -148,15 +282,18 @@ public class Character {
 	
 	public static void main(String[] args) {
 		
-		Scanner kb = new Scanner(System.in);
-		System.out.println("What level would you like your character?");
+//		Scanner kb = new Scanner(System.in);
+//		System.out.println("What level would you like your character?");
+//		
+//		int newCharLevel = kb.nextInt();
 		
-		int newCharLevel = kb.nextInt();
-		
+		Random rand = new Random();
+		int newCharLevel = (1 + rand.nextInt(4));
 		Character bob = new Character(newCharLevel);
 		
-		System.out.println("Name: " + bob.getName());
+		System.out.println("Name: " + bob.getName() + " " + bob.getSurname());
 		System.out.println("Race: " + bob.getRace());
+		System.out.println("Gender: " + bob.getGender());
 		System.out.println("Alignment: " + bob.getAlignment());
 		System.out.println("Level: " + bob.getLevel());
 		System.out.println("HP: " + bob.getHP());
