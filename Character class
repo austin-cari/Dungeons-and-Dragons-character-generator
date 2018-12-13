@@ -1,4 +1,5 @@
 import java.util.Random;
+import java.util.Scanner;
 
 public class Character {
 	
@@ -25,31 +26,34 @@ public class Character {
 	int WISmod;
 	int CHRmod;
 	
-	public Character() {
-		name = "Bob";
-		level = 1;
-		HP = 5;
-		alignment = (int) (1 + (Math.random()*8));
+	public Character(int l) {
+		
+		//Base ability scores set to 8 to ensure characters aren't complete morons in certain areas
 		strength = 8;
 		dexterity = 8;
 		constitution = 8;
 		intelligence = 8;
 		wisdom = 8;
 		charisma = 8;
-		this.setAbilityScores();
+		this.assignAbilityScores();
 		this.setModifiers();
+		this.setRace();
+		name = "Bob";
+		level = l;
+		HP = 5 * level;
+		alignment = (int) (1 + (Math.random()*8));
 	}
 	
-	public void setAbilityScores() {
+	public void assignAbilityScores() {
 		int[] abilityScores = new int[] {strength, dexterity, constitution, intelligence, wisdom, charisma};
 		
-		for(int n = 0; n < 27; n++) {					      // (8*6) + 27 = 75 total ability score points
+		for(int n = 0; n < 27; n++) {					// (8*6) + 27 = 75 total ability score points
 			Random rand = new Random();
-			int i = rand.nextInt(6);					        // Grabs a random integer between 0-5
+			int i = rand.nextInt(6);					// Grabs a random integer between 0-5
 			abilityScores[i] = abilityScores[i] + 1;	// Assign a point to the randomly selected score
 		}
-		strength = abilityScores[0];					      //Reassigns ability scores to their new, randomly
-		dexterity = abilityScores[1];					      //selected values
+		strength = abilityScores[0];					//Reassigns ability scores to their new, randomly
+		dexterity = abilityScores[1];					//selected values
 		constitution = abilityScores[2];
 		intelligence = abilityScores[3];
 		wisdom = abilityScores[4];
@@ -61,7 +65,7 @@ public class Character {
 		int[] abilityModifiers = new int[] {STRmod, DEXmod, CONmod, INTmod, WISmod, CHRmod};
 		
 		for(int n = 0; n < 6; n++) {
-			int score = abilityScores[n];		  //Create a reference to the ability score outside the array
+			int score = abilityScores[n];		//Create a reference to the ability score outside the array
 			if (score == 8 || score == 9) {		//Score of 8-9 creates a mod of -1
 				abilityModifiers[n] = -1;
 			}
@@ -83,12 +87,23 @@ public class Character {
 		}
 	}
 	
+	public void setRace() {
+		String[] possibleRaces = new String[] {"Human", "Elf", "Dwarf", "Gnome", "Halfling", "Half-Elf", "Half-Orc"};
+		Random rand = new Random();
+		int i = rand.nextInt(7);
+		race = possibleRaces[i];
+	}
+	
 	/********************************************
-	 ************ 	Get functions	  *************			
+	 ************ 	Get functions	*************			
 	 *******************************************/
 	
 	public String getName() {
 		return name;
+	}
+	
+	public String getRace() {
+		return race;
 	}
 	
 	public int getAlignment() {
@@ -128,13 +143,20 @@ public class Character {
 	}
 	
 	/********************************************
-	 ************ 	Main function	  *************			
+	 ************ 	Main function	*************			
 	 *******************************************/
 	
 	public static void main(String[] args) {
 		
-		Character bob = new Character();
+		Scanner kb = new Scanner(System.in);
+		System.out.println("What level would you like your character?");
+		
+		int newCharLevel = kb.nextInt();
+		
+		Character bob = new Character(newCharLevel);
+		
 		System.out.println("Name: " + bob.getName());
+		System.out.println("Race: " + bob.getRace());
 		System.out.println("Alignment: " + bob.getAlignment());
 		System.out.println("Level: " + bob.getLevel());
 		System.out.println("HP: " + bob.getHP());
