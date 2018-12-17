@@ -1,16 +1,46 @@
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Random;
-import java.util.Scanner;
 
+/*
+ * Author: Austin Cari
+ * Date: 12/7/18
+ * Description: Randomly generates a 5e Dungeons and Dragons character. Prints character information to console
+ */
 public class Character {
 	
-	//Character-defining traits 
-	String name;
-	String surname;
-	String race;
-	String gender;
+	//basic info
+	String name, surname, race, gender, pClass, background, alignment;
+	
+	//stats
 	int level;
-	int HP;
-	int alignment;			
+	
+	//maximum health points
+	int HP;					//need to properly calculate
+	
+	//Proficiency bonus
+	int profBonus;			//need to implement
+	
+	//armor class
+	int AC;					//need to implement
+	
+	//size of the character
+	String size;			//need to implement
+	
+	//speed per round. Typically 25 or 30
+	int speed;				//need to implement
+	
+	//passive wisdom
+	int passiveWis;			//need to implement
+	
+	// an array of 0s and 1s. 1 if they possess the skill, 0 if they don't
+	int[] skillProfs;		//need to implement
+	
+	//a list that contains all weapons/tools the character is proficient in 
+	ArrayList<String>proficencies;	//need to implement
+	
+	//A list of all the features the character gains from their class
+	ArrayList<String> features;	
 	
 	//ability scores
 	int strength;					
@@ -28,59 +58,263 @@ public class Character {
 	int WISmod;
 	int CHRmod;
 	
+	//equipment
+	ArrayList<String> inventory;			//need to implement
+	ArrayList<String> weapons;				//need to implement
+	String armor;							//need to implement
+	boolean shield;							//need to implement
+	
+	//Spells and stuff
+	ArrayList<String> firstLevelSpells;		//need to implement
+	int firstLevelSpellSlots;				//need to implement
+	
+	
+	//class specific parameters. Null if non applicable
+	String fightingStyle;
+	String martialArchetype;
+	String wizardingSchool;
+	String rangerArchetype;
+	
+	/*
+	 * Creates a randomly generated character at level 1.
+	 */
 	public Character() {
 		
-		//Base ability scores set to 8 to ensure characters aren't complete morons in certain areas
-		strength = 8;
-		dexterity = 8;
-		constitution = 8;
-		intelligence = 8;
-		wisdom = 8;
-		charisma = 8;
+		this.getRandomClass();
 		this.assignAbilityScores();
 		this.setModifiers();
-		this.setRace();
-		name = "Bob";
-		level = 1;
-		HP = 5 * level;
-		alignment = (int) (1 + (Math.random()*8));
-	}
-
-	public Character(int l) {
-		
-		//Base ability scores set to 8 to ensure characters aren't complete morons in certain areas
-		strength = 8;
-		dexterity = 8;
-		constitution = 8;
-		intelligence = 8;
-		wisdom = 8;
-		charisma = 8;
-		this.assignAbilityScores();
-		this.setModifiers();
-		this.setRace();
+		this.getRandomRace();
 		this.getRandomGender();
 		this.getRandomName();
-		level = l;
+		this.computeRest();
+		this.getRandomAlignment();
+		level = 1;
 		HP = 5 * level;
-		alignment = (int) (1 + (Math.random()*8));
 	}
 	
+	/*
+	 * When called, creates four randomly generated ability scores by rolling 4 dice, rerolling all 1's, and adding up the three highest scores.
+	 * Will then assign two highest values to the appropriate scores based on class requirements. For example, Fighters will assign their two highest
+	 * scores into strength and constitution.
+	 */
 	public void assignAbilityScores() {
-		int[] abilityScores = new int[] {strength, dexterity, constitution, intelligence, wisdom, charisma};
-		
-		for(int n = 0; n < 27; n++) {					// (8*6) + 27 = 75 total ability score points
-			Random rand = new Random();
-			int i = rand.nextInt(6);					// Grabs a random integer between 0-5
-			abilityScores[i] = abilityScores[i] + 1;	// Assign a point to the randomly selected score
+		ArrayList<Integer> abilityScores = new ArrayList<Integer>();
+		for(int n = 0; n < 6; n++) {
+			abilityScores.add(0);
 		}
-		strength = abilityScores[0];					//Reassigns ability scores to their new, randomly
-		dexterity = abilityScores[1];					//selected values
-		constitution = abilityScores[2];
-		intelligence = abilityScores[3];
-		wisdom = abilityScores[4];
-		charisma = abilityScores[5];
-	}
+		for(int n = 0; n < 6; n++){
+			Random rand = new Random();
+			int roll1 = 1 + rand.nextInt(6);
+			int roll2 = 1 + rand.nextInt(6);
+			int roll3 = 1 + rand.nextInt(6);
+			int roll4 = 1 + rand.nextInt(6);
+		
+			ArrayList<Integer> numList = new ArrayList<Integer>();
+			numList.add(roll1);
+			numList.add(roll2);
+			numList.add(roll3);
+			numList.add(roll4);
+			
+			for(int i = 0; i < 4; i++){
+				while(numList.get(i) <= 1) {
+					int newRoll = 1 + rand.nextInt(5);
+					numList.set(i, newRoll);
+				}
+			}
+			int minIndex = numList.indexOf(Collections.min(numList));
+			numList.remove(minIndex);
+			
+
+			for(int i = 0; i < 3; i++){
+				int interimScore = abilityScores.get(n) + numList.get(i); 
+				abilityScores.set(n, interimScore);
+			}
+		}
+		
+		if(pClass == "Barbarian"){
+			int index = abilityScores.indexOf(Collections.max(abilityScores));
+			strength = abilityScores.get(index);
+			abilityScores.remove(index);
+
+			int nIndex = abilityScores.indexOf(Collections.max(abilityScores));
+			constitution = abilityScores.get(nIndex);
+			abilityScores.remove(nIndex);
+			
+			dexterity = abilityScores.get(0);
+			intelligence = abilityScores.get(1);
+			wisdom = abilityScores.get(2);
+			charisma = abilityScores.get(3);	
+			}
+		
+		if(pClass == "Bard"){
+			int index = abilityScores.indexOf(Collections.max(abilityScores));
+			charisma = abilityScores.get(index);
+			abilityScores.remove(index);
+
+			int nIndex = abilityScores.indexOf(Collections.max(abilityScores));
+			dexterity = abilityScores.get(nIndex);
+			abilityScores.remove(nIndex);
+			
+			strength = abilityScores.get(0);
+			intelligence = abilityScores.get(1);
+			wisdom = abilityScores.get(2);
+			constitution = abilityScores.get(3);	
+			}
+		
+		if(pClass == "Cleric"){
+			int index = abilityScores.indexOf(Collections.max(abilityScores));
+			wisdom = abilityScores.get(index);
+			abilityScores.remove(index);
+
+			int nIndex = abilityScores.indexOf(Collections.max(abilityScores));
+			charisma = abilityScores.get(nIndex);
+			abilityScores.remove(nIndex);
+			
+			dexterity = abilityScores.get(0);
+			intelligence = abilityScores.get(1);
+			strength = abilityScores.get(2);
+			constitution = abilityScores.get(3);	
+			}
+		
+		if(pClass == "Druid"){
+			int index = abilityScores.indexOf(Collections.max(abilityScores));
+			intelligence = abilityScores.get(index);
+			abilityScores.remove(index);
+
+			int nIndex = abilityScores.indexOf(Collections.max(abilityScores));
+			wisdom = abilityScores.get(nIndex);
+			abilityScores.remove(nIndex);
+			
+			dexterity = abilityScores.get(0);
+			strength = abilityScores.get(1);
+			constitution = abilityScores.get(2);
+			charisma = abilityScores.get(3);	
+			}
+		
+		if(pClass == "Fighter"){
+			int index = abilityScores.indexOf(Collections.max(abilityScores));
+			strength = abilityScores.get(index);
+			abilityScores.remove(index);
+
+			int nIndex = abilityScores.indexOf(Collections.max(abilityScores));
+			constitution = abilityScores.get(nIndex);
+			abilityScores.remove(nIndex);
+			
+			dexterity = abilityScores.get(0);
+			intelligence = abilityScores.get(1);
+			wisdom = abilityScores.get(2);
+			charisma = abilityScores.get(3);	
+			}
+		
+		if(pClass == "Monk"){
+			int index = abilityScores.indexOf(Collections.max(abilityScores));
+			strength = abilityScores.get(index);
+			abilityScores.remove(index);
+
+			int nIndex = abilityScores.indexOf(Collections.max(abilityScores));
+			dexterity = abilityScores.get(nIndex);
+			abilityScores.remove(nIndex);
+			
+			constitution = abilityScores.get(0);
+			intelligence = abilityScores.get(1);
+			wisdom = abilityScores.get(2);
+			charisma = abilityScores.get(3);	
+			}
+		
+		if(pClass == "Paladin"){
+			int index = abilityScores.indexOf(Collections.max(abilityScores));
+			wisdom = abilityScores.get(index);
+			abilityScores.remove(index);
+
+			int nIndex = abilityScores.indexOf(Collections.max(abilityScores));
+			charisma = abilityScores.get(nIndex);
+			abilityScores.remove(nIndex);
+			
+			dexterity = abilityScores.get(0);
+			intelligence = abilityScores.get(1);
+			strength = abilityScores.get(2);
+			constitution = abilityScores.get(3);	
+			}
+		
+		if(pClass == "Ranger"){
+			int index = abilityScores.indexOf(Collections.max(abilityScores));
+			dexterity = abilityScores.get(index);
+			abilityScores.remove(index);
+
+			int nIndex = abilityScores.indexOf(Collections.max(abilityScores));
+			wisdom = abilityScores.get(nIndex);
+			abilityScores.remove(nIndex);
+			
+			strength = abilityScores.get(0);
+			intelligence = abilityScores.get(1);
+			constitution = abilityScores.get(2);
+			charisma = abilityScores.get(3);	
+			}
+		
+		if(pClass == "Rogue"){
+			int index = abilityScores.indexOf(Collections.max(abilityScores));
+			dexterity = abilityScores.get(index);
+			abilityScores.remove(index);
+
+			int nIndex = abilityScores.indexOf(Collections.max(abilityScores));
+			intelligence = abilityScores.get(nIndex);
+			abilityScores.remove(nIndex);
+			
+			strength = abilityScores.get(0);
+			constitution = abilityScores.get(1);
+			wisdom = abilityScores.get(2);
+			charisma = abilityScores.get(3);	
+			}
+		
+		if(pClass == "Rogue"){
+			int index = abilityScores.indexOf(Collections.max(abilityScores));
+			constitution = abilityScores.get(index);
+			abilityScores.remove(index);
+
+			int nIndex = abilityScores.indexOf(Collections.max(abilityScores));
+			charisma = abilityScores.get(nIndex);
+			abilityScores.remove(nIndex);
+			
+			strength = abilityScores.get(0);
+			dexterity = abilityScores.get(1);
+			wisdom = abilityScores.get(2);
+			intelligence = abilityScores.get(3);	
+			}
+		
+		if(pClass == "Warlock"){
+			int index = abilityScores.indexOf(Collections.max(abilityScores));
+			wisdom = abilityScores.get(index);
+			abilityScores.remove(index);
+
+			int nIndex = abilityScores.indexOf(Collections.max(abilityScores));
+			charisma = abilityScores.get(nIndex);
+			abilityScores.remove(nIndex);
+			
+			dexterity = abilityScores.get(0);
+			intelligence = abilityScores.get(1);
+			strength = abilityScores.get(2);
+			constitution = abilityScores.get(3);	
+			}
+		
+		if(pClass == "Wizard"){
+			int index = abilityScores.indexOf(Collections.max(abilityScores));
+			intelligence = abilityScores.get(index);
+			abilityScores.remove(index);
+
+			int nIndex = abilityScores.indexOf(Collections.max(abilityScores));
+			wisdom = abilityScores.get(nIndex);
+			abilityScores.remove(nIndex);
+			
+			dexterity = abilityScores.get(0);
+			strength = abilityScores.get(1);
+			constitution = abilityScores.get(2);
+			charisma = abilityScores.get(3);	
+			}
+		}
 	
+	/*
+	 * Calculates the modifiers for each ability score. Affects how well you perform skills that correspond to the appropriate ability.
+	 */
 	public void setModifiers() {
 		int[] abilityScores = new int[] {strength, dexterity, constitution, intelligence, wisdom, charisma};
 		int[] abilityModifiers = new int[] {STRmod, DEXmod, CONmod, INTmod, WISmod, CHRmod};
@@ -115,13 +349,19 @@ public class Character {
 		CHRmod = abilityModifiers[5];
 	}
 	
-	public void setRace() {
-		String[] possibleRaces = new String[] {"Human", "Elf", "Dwarf"};
+	/*
+	 * picks a random race for the character object
+	 */
+	public void getRandomRace() {
+		String[] possibleRaces = new String[] {"Human", "Elf", "Dwarf", "Half Orc", "Half Elf"};
 		Random rand = new Random();
-		int i = rand.nextInt(3);
+		int i = rand.nextInt(5);
 		race = possibleRaces[i];
 	}
 	
+	/*
+	 * picks a random name for the character, subject to race and gender. Surnames are genderless.
+	 */
 	public void getRandomName() {
 		String[] maleHumanNames = new String[] {"Axel", "Ander", "Adam", "Bernard", "Bertram", "Chen", "Diggery", "Dante", "Evendur", "Francis", "Gilbert",
 												"Grim", "Henry", "Homer", "Igor", "Jiang", "Jaques", "Kane", "Leonard", "Lukas", "Luther", "Meliodas", "Mark",
@@ -137,7 +377,7 @@ public class Character {
 												  "Simiko", "Tabatha", "Tammy", "Tara", "Ursala", "Usagai", "Valentine", "Valora", "Valerie", "Wilma", "Winnie",
 												  "Willow", "Xena", "Yuriko", "Yuri", "Yolanda", "Yona", "Zelda", "Zamora"};
 		
-		String[] humanSurnames = new String[] {"Amblecrown", "Bump", "Cari", "Davis", "Edwards", "Flores", "Griffin", "Hilton", "Ivanwood", "Jassan", "Khalid",
+		String[] humanSurnames = new String[] {"Amblecrown", "Brienn", "Cyress", "Davis", "Edwards", "Flores", "Griffin", "Hilton", "Ivanwood", "Jassan", "Khalid",
 												"Moore", "Murnythera", "Mostana", "Nemestek", "Osyris", "Orion", "Pashar", "Perez", "Quill", "Richardson", 
 												"Rodriguez", "Shin", "Smith", "Thompson", "Ulmonika", "Van", "Willhelm", "Walker", "Yursof", "Zephyr"};
 		
@@ -145,24 +385,25 @@ public class Character {
 												"Travok", "Orsik", "Flint", "Rurik", "Thorin", "Ulfgar", "Vondal"};
 		
 		String[] femaleDwarfNames = new String[] {"Amber", "Artin", "Audhild", "Dagnal", "Eldeth", "Finellen", "Gunndola", "Gurdis", "Helja", "Kathra", "Ilde",
-												"Kristryd", "Mardred", "Riswynn", "Torbera", "Vistra"};
+												  "Kristryd", "Mardred", "Riswynn", "Torbera", "Vistra", "Sylveria"};
 		
 		String[] dwarfSurnames = new String[] {"Balderk", "Battlehammer", "Brawnanvil", "Dankil", "Fireforge", "Frostbeard", "Gorunn", "Ironfist", "Loderr", 
 												"Lutgehr", "Rumnaheim", "Torunn", "Ungart"};
 		
-		String[] maleElfNames = new String[] {"Adran", "Aramil", "Aust" , "Erevan" , "Fivin" , "Galinndan", "Gennal" , "Halimath", "Hiimo", "Immeral", "Korfel",
-												"Lamlis", "Quarion", "Rolen", "Theren", "Theriatis", "Uthemar"};
+		String[] maleElfNames = new String[] {"Adran", "Aramil", "Austrin" , "Erevan" , "Fivin" , "Galinndan", "Gennal" , "Halimath", "Hiimo", "Immeral", "Korfel",
+												"Lamlis", "Quarion", "Rolen", "Theren", "Theriatis", "Uthemar", "Tezoth", "Kaelthrimar", "Ardyn"};
 
 		String[] femaleElfNames = new String[] {"Arara", "Amastrianna", "Antinua", "Birel", "Caelynn", "Chaedi", "Dara", "Drusilia", "Elama", "Enna", "Hatae",
-												"Lelenia", "Keyleth"};
+												"Lelenia", "Keyleth", "Feyrre", "Melthrissa", "Aryana"};
 		
-		String[] elfSurnames = new String[] {"Amakiir", "Berevean", "Caerdnel", "Casilltenirra", "Cithreth", "Dalanthan", "Mystralath", "Ofandrus", "Ostoroth",
-											"Othronus", "Qualianthri", "Sylvaranth", "Raethran", "Liadon", "Lathalas"};
+		String[] elfSurnames = new String[] {"Amakiir", "Caerdnel", "Casilltenirra", "Cithreth", "Mystralath", "Ofandrus", "Ostoroth","Othronus", 
+											"Qualianthri", "Sylvaranth", "Raethran", "Liadon", "Lathalas", "Brightmoon", "Stargazer", "Moonbright", "Featherfall",
+											"Silverweaver", "Moonlight", "Duskbreaker", "Shinebright", "Sunfury", "Featherdash", "Bladedancer", "Shadowspinner"};
 		
 		Random rand = new Random();
 		
 		//If you are a human
-		if(race == "Human") {
+		if(race == "Human" || race == "Half Orc") {
 			int bound = humanSurnames.length;				//Creates a variable that will make sure to pick a name within array bounds
 			int i = rand.nextInt(bound);					//picks a random name
 			surname = humanSurnames[i];						//initializes your surname
@@ -207,18 +448,129 @@ public class Character {
 				name = femaleDwarfNames[i3];
 			}	
 		}
-	}
-		
-		public void getRandomGender() {
-			Random rand = new Random();
-			int i = rand.nextInt(1);
-			if(i == 0) {
-				gender = "Male";
+		if(race == "Half Elf") {								//Have to do extra work to combine the elf and human arrays for each possibility
+			int i = humanSurnames.length;
+			int n = elfSurnames.length;
+			String[] possible = new String[n + i];
+			for(int g = 0; g < humanSurnames.length; g++) {
+				possible[g] = humanSurnames[g];
 			}
-			else {
-				gender = "Female";
+			for(int h = 0; h < elfSurnames.length; h++) {
+				possible[h + i] = elfSurnames[h];
+			}
+			int choice = rand.nextInt(possible.length);
+			surname = possible[choice];
+			if(gender == "Male") {
+				int i2 = maleHumanNames.length;
+				int n2 = maleElfNames.length;
+				String[] possible2 = new String[n2 + i2];
+				for(int g = 0; g < maleHumanNames.length; g++) {
+					possible2[g] = maleHumanNames[g];
+				}
+				for(int h = 0; h < maleElfNames.length; h++) {
+					possible2[h + i2] = maleElfNames[h];
+				}
+				int choice2 = rand.nextInt(possible2.length);
+				name = possible2[choice2];
+			}
+			if(gender == "Female") {
+				int i3 = femaleHumanNames.length;
+				int n3 = femaleElfNames.length;
+				String[] possible3 = new String[n3 + i3];
+				for(int g = 0; g < femaleHumanNames.length; g++) {
+					possible3[g] = femaleHumanNames[g];
+				}
+				for(int h = 0; h < femaleElfNames.length; h++) {
+					possible3[h + i3] = femaleElfNames[h];
+				}
+				int choice3 = rand.nextInt(possible3.length);
+				name = possible3[choice3];
 			}
 		}
+	}
+		
+	/*
+	 * Picks a random gender
+	 */
+	public void getRandomGender() {
+		Random rand = new Random();
+		int i = rand.nextInt(1);
+		if(i == 0) {
+			gender = "Male";
+		}
+		else {
+			gender = "Female";
+		}
+	}
+	
+	public void getRandomAlignment() {
+		Random rand = new Random();
+		int choice  = 1 + rand.nextInt(100);
+		if(choice > 0 && choice < 16) {
+			alignment = "Lawful Good";
+		}
+		if(choice > 15 && choice < 26) {
+			alignment = "Neutral Good";
+		}
+		if(choice > 25 && choice < 41) {
+			alignment = "Chaotic Good";
+		}
+		if(choice > 40 && choice < 56) {
+			alignment = "Lawful Neutral";
+		}
+		if(choice > 56 && choice < 66) {
+			alignment = "True Neutral";
+		}
+		if(choice > 65 && choice < 81) {
+			alignment = "Chaotic Neutral";
+		}
+		if(choice > 80 && choice < 91) {
+			alignment = "Lawful Evil";
+		}
+		if(choice > 90 && choice < 99) {
+			alignment = "Neutral Evil";
+		}
+		if(choice == 99 || choice == 100) {
+			alignment = "Chaotic Evil";
+		}
+	}
+	
+	/*
+	 * picks a random class for the character
+	 */
+	public void getRandomClass() {
+		String[] possibleClasses = new String[] {"Barbarian", "Bard", "Cleric", "Druid", "Fighter", "Monk", "Paladin"," Rogue", "Ranger", "Sorcerer", "Warlock", "Wizard"};
+		Random rand = new Random();
+		int chosenClass = rand.nextInt(12);
+		pClass = possibleClasses[chosenClass];
+	}
+	
+	/*
+	 * depending on what class the character is, the rest of the fields will be filled in automatically
+	 */
+	public void computeRest() {
+		if(pClass == "Fighter") {
+			this.fighterChanges();
+		}
+		if(pClass == "Ranger") {
+			this.rangerChanges();
+		}
+		if(pClass == "Wizard") {
+			this.wizardChanges();
+		}
+	}
+	
+	public void fighterChanges() {
+		//TO-DO
+	}
+	
+	public void rangerChanges() {
+		//TO-DO
+	}
+	
+	public void wizardChanges() {
+		//TO-DO
+	}
 	
 	/********************************************
 	 ************ 	Get functions	*************			
@@ -226,6 +578,10 @@ public class Character {
 	
 	public String getName() {
 		return name;
+	}
+	
+	public String getpClass() {
+		return pClass;
 	}
 	
 	public String getSurname() {
@@ -240,7 +596,7 @@ public class Character {
 		return gender;
 	}
 	
-	public int getAlignment() {
+	public String getAlignment() {
 		return alignment;
 	}
 	
@@ -281,20 +637,18 @@ public class Character {
 	 *******************************************/
 	
 	public static void main(String[] args) {
+
+		Character bob = new Character();
 		
-//		Scanner kb = new Scanner(System.in);
-//		System.out.println("What level would you like your character?");
-//		
-//		int newCharLevel = kb.nextInt();
-		
-		Random rand = new Random();
-		int newCharLevel = (1 + rand.nextInt(4));
-		Character bob = new Character(newCharLevel);
-		
+		System.out.println("Character defining traits:");
+		System.out.println("---------------------------------------");
 		System.out.println("Name: " + bob.getName() + " " + bob.getSurname());
 		System.out.println("Race: " + bob.getRace());
+		System.out.println("Class: " + bob.getpClass());
 		System.out.println("Gender: " + bob.getGender());
-		System.out.println("Alignment: " + bob.getAlignment());
+		System.out.println("Alignment: " + bob.getAlignment() + "\n");
+		System.out.println("Character Stats:");
+		System.out.println("---------------------------------------");
 		System.out.println("Level: " + bob.getLevel());
 		System.out.println("HP: " + bob.getHP());
 		System.out.println("Strength: " + bob.getStrength());
@@ -302,7 +656,9 @@ public class Character {
 		System.out.println("Constitution: " + bob.getConstitution());
 		System.out.println("Intelligence: " + bob.getIntelligence());
 		System.out.println("Wisdom: " + bob.getWisdom());
-		System.out.println("Charisma: " + bob.getCharisma());
+		System.out.println("Charisma: " + bob.getCharisma() + "\n");
+		System.out.println("---------------------------------------");
+		
 		}
 	
 }
