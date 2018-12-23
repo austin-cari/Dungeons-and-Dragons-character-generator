@@ -19,25 +19,25 @@ public class Character {
 	int HP;					
 	
 	//Proficiency bonus
-	int profBonus;			//need to implement
+	int profBonus;			
 	
 	//armor class
 	int AC;					//need to implement
 	
 	//size of the character
-	String size;			//need to implement
+	String size;			
 	
 	//speed per round. Typically 25 or 30
-	int speed;				//need to implement
+	int speed;				
 	
 	//passive wisdom
-	int passiveWis;			//need to implement
+	int passiveWis;			
 	
 	// an array of 0s and 1s. 1 if they possess the skill, 0 if they don't
-	int[] skillProfs = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};		//need to implement
+	int[] skillProfs = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};		
 	
 	//a list that contains all weapons/tools the character is proficient in 
-	ArrayList<String>proficiencies = new ArrayList<String>();	//need to implement
+	ArrayList<String>proficiencies = new ArrayList<String>();	
 	
 	//A list of all the features the character gains from their class
 	ArrayList<String> features = new ArrayList<String>();	
@@ -62,23 +62,23 @@ public class Character {
 	int[] abilitySavingThrows = {0,0,0,0,0,0};
 	
 	//equipment
-	ArrayList<String> inventory = new ArrayList<String>();			//need to implement
-	ArrayList<String> weapons = new ArrayList<String>();				//need to implement
-	String armor;							//need to implement
-	boolean shield;							//need to implement
+	ArrayList<String> inventory = new ArrayList<String>();			
+	ArrayList<String> weapons = new ArrayList<String>();				
+	String armor;							
+	boolean shield;							
 	int[] currency = {0,0,0};				//currency[0] = copper coins, currency [1] = silver coins, etc...
 	
 	//Spells and stuff
 	ArrayList<String> firstLevelSpells = new ArrayList<String>();		//need to implement
-	int firstLevelSpellSlots;				//need to implement
+	int firstLevelSpellSlots;											//need to implement
 	
 	
 	//class specific archetypes. Null if non applicable
+	String clericDomain;
 	String fightingStyle;
-	String martialArchetype;
-	String wizardingSchool;
-	String rangerArchetype;
-	
+	String favoredEnemy;
+	String sorcerousOrigin;
+	String otherworldyPatron;
 	//languages known and how many you know
 	int langAmount;
 	ArrayList<String> languagesKnown = new ArrayList<String>();
@@ -87,10 +87,20 @@ public class Character {
 	 * Creates a randomly generated character at level 1.
 	 */
 	public Character() {
-		
+			
+		//set any class/background-specific parameters to empty strings;
+		this.clericDomain = "";
+		this.fightingStyle = "";
+		this.favoredEnemy = "";
+		this.sorcerousOrigin = "";
+		this.otherworldyPatron = "";
 		title = "";
+		
+		//we only create level one characters. All level 1 characters have + proficiency bonus
 		level = 1;
 		profBonus = 2;
+		
+		
 		this.getRandomClass();
 		this.assignAbilityScores();
 		this.setModifiers();
@@ -875,78 +885,80 @@ public class Character {
 		
 		//EXAMPLE CODE
 		if(pClass == "Fighter") {
-			this.computeHP();						//Compute the HP now 
-			proficiencies.add("Light Armor");		//Add all weapon, armor and tool proficiencies to the ArrayList proficiencies.
-			proficiencies.add("Medium Armor");		//Please remember that these types of proficiencies are different than skill proficiencies
-			proficiencies.add("Heavy Armor");
-			proficiencies.add("Shields");
-			proficiencies.add("Simple Weapons");
-			proficiencies.add("Martial Weapons");
+			if(level > 0) {
+				this.computeHP();						//Compute the HP now 
+				proficiencies.add("Light Armor");		//Add all weapon, armor and tool proficiencies to the ArrayList proficiencies.
+				proficiencies.add("Medium Armor");		//Please remember that these types of proficiencies are different than skill proficiencies
+				proficiencies.add("Heavy Armor");
+				proficiencies.add("Shields");
+				proficiencies.add("Simple Weapons");
+				proficiencies.add("Martial Weapons");
 			
-			abilitySavingThrows[0] = 1;				//Proficient in strength and constitution saving throws
-			abilitySavingThrows[2] = 1;				
+				abilitySavingThrows[0] = 1;				//Proficient in strength and constitution saving throws
+				abilitySavingThrows[2] = 1;				
 			
-			//Gain two random skills among Acrobatics, Animal Handling, Athletics, History, Insight, Intimidation, Perception, and Survival.
-			int[] possibleSkills = {0, 1, 3, 5, 6, 7, 11, 17};
-			int choice1 = rand.nextInt(8);			//See explanation for skillProfs if confused why these numbers were chosen for possibleSkills. these are the indices
-			int choice2 = rand.nextInt(8);			//of the skills listed in the above comment in the skillProfs array
-			while(choice1 == choice2) {				//If choices are the same skill, choose again till choices are different
-				choice2 = rand.nextInt(8);
-			}
-			skillProfs[choice1] = 1;				//Assign those skills
-			skillProfs[choice2] = 1;
+				//Gain two random skills among Acrobatics, Animal Handling, Athletics, History, Insight, Intimidation, Perception, and Survival.
+				int[] possibleSkills = {0, 1, 3, 5, 6, 7, 11, 17};
+				int choice1 = rand.nextInt(8);			//See explanation for skillProfs if confused why these numbers were chosen for possibleSkills. these are the indices
+				int choice2 = rand.nextInt(8);			//of the skills listed in the above comment in the skillProfs array
+				while(choice1 == choice2) {				//If choices are the same skill, choose again till choices are different
+					choice2 = rand.nextInt(8);
+				}
+					skillProfs[choice1] = 1;				//Assign those skills
+				skillProfs[choice2] = 1;
 			
-			//Now, give your character equipment based on the PHB starting gear per the class
+				//Now, give your character equipment based on the PHB starting gear per the class
 			
-			//Chain mail or leather armor, longbow and 20 arrows. 
-			int equipementChoice1 = rand.nextInt(2);
-			if (equipementChoice1 == 0) {
-				armor = "Chain Mail";
+				//Chain mail or leather armor, longbow and 20 arrows. 
+				int equipementChoice1 = rand.nextInt(2);
+				if (equipementChoice1 == 0) {
+					armor = "Chain Mail";
+				}
+				else {
+					armor = "Leather armor";
+					weapons.add("Longbow");
+					inventory.add("Arrows 20x");
+				}
+				
+				//a martial weapon and a shield or two martial weapons
+				int equipmentChoice2 = rand.nextInt(2);
+				if(equipmentChoice2 == 0) {
+					weapons.add(getRandomMeleeMartialWeapon());
+					shield = true;
+				}
+				else {
+					weapons.add(getRandomMeleeMartialWeapon());
+					weapons.add(getRandomMeleeMartialWeapon());
+				}
+				
+				//a light crossbow and 20 bolts or two handaxes
+				int equipmentChoice3 = rand.nextInt(2);
+				if(equipmentChoice3 == 0) {
+					weapons.add("Light Crossbow");
+					inventory.add("Bolts 20x");
+				}
+				else {
+					weapons.add("Handaxe");
+					weapons.add("Handaxe");
+				}
+				
+				//a dungeoneer's pack or an adventurer's pack
+				int equipmentChoice4 = rand.nextInt(2);
+				if(equipmentChoice4 == 0) {
+					gainDungeoneersPack();
+				}
+				else {
+					gainExplorersPack();
+				}
+				
+				//At level 1, fighters choose a fighting style that defines the type of combat they excel in. Choose a random fighting style
+				String[] possibleFightingStyles = {"Archery", "Defense", "Dueling", "Great Weapon Fighting", "Protection", "Two Weapon Fighting"};
+				int styleChoice = rand.nextInt(6);
+				fightingStyle = possibleFightingStyles[styleChoice];
+				
+				//Also gain the feature second wind at level 1
+				features.add("Second Wind(PHB 72)");
 			}
-			else {
-				armor = "Leather armor";
-				weapons.add("Longbow");
-				inventory.add("Arrows 20x");
-			}
-			
-			//A martial weapon and a shield or two martial weapons
-			int equipmentChoice2 = rand.nextInt(2);
-			if(equipmentChoice2 == 0) {
-				weapons.add(getRandomMeleeMartialWeapon());
-				shield = true;
-			}
-			else {
-				weapons.add(getRandomMeleeMartialWeapon());
-				weapons.add(getRandomMeleeMartialWeapon());
-			}
-			
-			//A light crossbow and 20 bolts or two handaxes
-			int equipmentChoice3 = rand.nextInt(2);
-			if(equipmentChoice3 == 0) {
-				weapons.add("Light Crossbow");
-				inventory.add("Bolts 20x");
-			}
-			else {
-				weapons.add("Handaxe");
-				weapons.add("Handaxe");
-			}
-			
-			//A dungeoneer's pack or an adventurer's pack
-			int equipmentChoice4 = rand.nextInt(2);
-			if(equipmentChoice4 == 0) {
-				gainDungeoneersPack();
-			}
-			else {
-				gainExplorersPack();
-			}
-			
-			//At level 1, fighters choose a fighting style that defines the type of combat they excel in. Choose a random fighting style
-			String[] possibleFightingStyles = {"Archery", "Defense", "Dueling", "Great Weapon Fighting", "Protection", "Two Weapon Fighting"};
-			int styleChoice = rand.nextInt(6);
-			fightingStyle = possibleFightingStyles[styleChoice];
-			
-			//Also gain the feature second wind at level 1
-			features.add("Second Wind(PHB 72)");
 		}
 	}
 	
@@ -954,7 +966,7 @@ public class Character {
 	/********************************************
 	 ************  Helper functions	*************			
 	 *******************************************/
-	//When a feature is invoked enough times, it becomes more convenient to create a seperate method for it and call it whenever it is needed. Many of the classes gain
+	//When a feature is invoked enough times, it becomes more convenient to create a separate method for it and call it whenever it is needed. Many of the classes gain
 	//a random weapon when they start, so it is more consistent to create the method once rather than hard code it in the main method. These are what those functions
 	//are. The names are self-explanatory and should be pretty straightforward.  
 	
