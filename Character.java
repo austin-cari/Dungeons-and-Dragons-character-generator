@@ -37,7 +37,7 @@ public class Character {
 	int[] skillProfs = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};		//need to implement
 	
 	//a list that contains all weapons/tools the character is proficient in 
-	ArrayList<String>proficencies = new ArrayList<String>();	//need to implement
+	ArrayList<String>proficiencies = new ArrayList<String>();	//need to implement
 	
 	//A list of all the features the character gains from their class
 	ArrayList<String> features = new ArrayList<String>();	
@@ -57,6 +57,9 @@ public class Character {
 	int INTmod;
 	int WISmod;
 	int CHRmod;
+	
+	//An array to track which two ability scores you are proficient in 
+	int[] abilitySavingThrows = {0,0,0,0,0,0};
 	
 	//equipment
 	ArrayList<String> inventory = new ArrayList<String>();			//need to implement
@@ -94,69 +97,20 @@ public class Character {
 		this.getRandomRace();
 		this.getRandomGender();
 		this.getRandomName();
-		this.computeHP();
 		this.getRandomBackground();
 		this.getRandomAlignment();
 		
 	}
-	
-	public void getEquipment() {
-		String[] burglarsPack = {"Backpack", "bag of 1000 ball bearings", "10 feet of string", "bell", "candle 5x", "crowbar", "hammer", "pitons 10x", 
-								"hooded lantern", "flask of oil 2x", "daily ration 5x", "tinderbox", "waterskin", "50 ft of rope"};
-		String[] diplomatsPack = {"small chest", "scroll case 2x", "set of fine clothes", "ink bottle", "ink pen", "lamp", "Flask of oil 2x", "sheet of paper 5x",
-								"perfume vial", "sealing wax", "soap"};
-		String[] dungeoneersPack = {"Backpack", "crowbar", "hammer", "pitons 10x", "torches 10x", "tinderbox", "daily ration 10x", "waterskin", "50 ft of rope"};
-		String[] entertainersPack = {"Backpack", "bedroll", "costume 2x", "candle 5x", "daily ration 5x", "waterskin", "Disguise kit"};
-		String[] explorersPack = {"Backpack", "bedroll", "mess kit", "tinderbox", "torch 10x", "daily ration 10x", "waterskin", "50 ft of rope"};
-		String[] priestsPack = {"Backpack", "blanket", "candle 10x", "tinderbox", "alms box", "block of incense 2x", "censer", "vestments", "daily ration 2x",
-								"waterskin"};
-		String[] scholarsPack = {"Backpack", "book of lore", "ink bottle", "ink pen", "sheet of paper 10x", "small bag of sand", "small knife"};
-		
-		Random rand = new Random();
-		
-		if(pClass == "Barbarian") {
-			
-		}
-		if(pClass == "Bard") {
-			
-		}
-		if(pClass == "Cleric") {
-			
-		}
-		if(pClass == "Druid") {
-			
-		}
-		if(pClass == "Fighter") {
-			
-		}
-		if(pClass == "Monk") {
-			
-		}
-		if(pClass == "Paladin") {
-			
-		}
-		if(pClass == "Ranger") {
-			
-		}
-		if(pClass == "Rogue") {
-			
-		}
-		if(pClass == "Sorcerer") {
-			
-		}
-		if(pClass == "Warlock") {
-			
-		}
-		if(pClass == "Wizard") {
-			
-		}
-	}
 
 	/*
-	 * Gives the character a random background based on their class and applies the correct proficiencies, equipment and gold
+	 * Gives the character a random background that can be easily tied to their class. For instance, a Paladin is more likely to be a Folk Hero than a Criminal.
+	 * A Bard is more likely to be an entertainer than a Wizard. This function picks a random background, and then gives the character whatever benfitis come with it,
+	 * in the form of extra equipment, gold and profs.
 	 */
 	public void getRandomBackground() {
 		Random rand = new Random();
+		
+		//Step 1: Based on your class, pick a random background that is thematic to your character.
 		
 		if(pClass == "Barbarian") {
 			String[] potentialBackground = {"Criminal", "Folk Hero", "Hermit", "Outlander", "Soldier"};
@@ -219,7 +173,14 @@ public class Character {
 			background = potentialBackground[choice];
 		}
 		
-		//Now apply changes based on background picked
+		//Step 2: Give the character whatever benefits come with the chosen background. 
+		//NOTE: There is one aspect of the background feature missing. Each background has a special field associated with it that I have not coded in yet.
+		//For instance, the criminal background has a feature in the PHB 129 called specialty, with an 8 cell table listing certain types of crime. Blackmailer, burglar, 
+		//enforcer, highway robber, pickpocket, and so on. It adds another layer of personality to the character. Adding a specific skill even within a background that makes
+		//character feel fleshed out. Each background has a field like this. Entertainer has a specialty routine, Guild Artisans have trading/crafting specialties, and so 
+		//forth. I think the best way to store this information is in a global var named String backgroundSpecialty (or something like that) that stores a value from the tables
+		//in the PHB. A good example of what I am talking about is under the if statement when your background is a Charlatan. Notice how I use a Random object to choose
+		//an item to add to my inventory based on conOfChoice. 
 		
 		if(background == "Acolyte") {
 			features.add("Shelter of the Faithful(PHB 127)");
@@ -304,8 +265,8 @@ public class Character {
 			inventory.add("signet ring");
 			inventory.add("scroll of pedigree");
 			currency[2] = currency[2] + 25;
-			title = getRandomTitle();							//fill out array in static method
-		}
+			title = getRandomTitle();							//This method gives the player a random title, which is set to "" in the constructor. Only
+		}														//Nobles have titles.
 		if(background == "Outlander") {
 			features.add("Wanderer(PHB 136)");
 			skillProfs[3] = 1;	//athletics
@@ -382,40 +343,43 @@ public class Character {
 	 * scores into strength and constitution.
 	 */
 	public void assignAbilityScores() {
-		ArrayList<Integer> abilityScores = new ArrayList<Integer>();
-		for(int n = 0; n < 6; n++) {
-			abilityScores.add(0);
+		ArrayList<Integer> abilityScores = new ArrayList<Integer>();	//Init an array to store your rolled values.
+		for(int n = 0; n < 6; n++) {									//run 6 times for 6 rolls.
+			abilityScores.add(0);										//add 6 elements to the array
 		}
 		for(int n = 0; n < 6; n++){
 			Random rand = new Random();
-			int roll1 = 1 + rand.nextInt(6);
+			int roll1 = 1 + rand.nextInt(6);							//Roll 4 dice with a range of 1-6. Store them in roll1-4
 			int roll2 = 1 + rand.nextInt(6);
 			int roll3 = 1 + rand.nextInt(6);
 			int roll4 = 1 + rand.nextInt(6);
-		
-			ArrayList<Integer> numList = new ArrayList<Integer>();
+			
+			ArrayList<Integer> numList = new ArrayList<Integer>();		//Add the four rolls to the same collection so they can be compared.
 			numList.add(roll1);
 			numList.add(roll2);
 			numList.add(roll3);
 			numList.add(roll4);
 			
-			for(int i = 0; i < 4; i++){
-				while(numList.get(i) <= 1) {
-					int newRoll = 1 + rand.nextInt(5);
+			for(int i = 0; i < 4; i++){									//This for statement looks to see if any of the elements is a 1. If it is a 1, reroll that 
+				while(numList.get(i) <= 1) {							//dice until it is not a 1. This makes sure that awful rolls don't ruin an entire character
+					int newRoll = 1 + rand.nextInt(5);					//and make ability stores slightly more consistent
 					numList.set(i, newRoll);
 				}
 			}
-			int minIndex = numList.indexOf(Collections.min(numList));
+			int minIndex = numList.indexOf(Collections.min(numList));	//remove the lowest value. We are only adding the top 3.
 			numList.remove(minIndex);
 			
 
-			for(int i = 0; i < 3; i++){
+			for(int i = 0; i < 3; i++){										//Add up the remaining 3 values. Now store that value in the Nth element of abilityScores
 				int interimScore = abilityScores.get(n) + numList.get(i); 
 				abilityScores.set(n, interimScore);
 			}
 		}
 		
-		//After rolling your 6 stats, will put your best two into the most important ability scores eg. Barbarian needs con and str to be the highest
+		//After having rolled your 6 stats, you will place the two highest numbers into your two most important scores. Each class has two classes that they are
+		//proficient in regarding saving throws. These two scores also define the class and need to be the highest to support the mechanics of the class. For example, 
+		//Barbarians need high strength to wield heavy weapons and survive damage. Wizards need high intelligence to cast spells. The remaining four scores are assigned
+		//randomly to add variety to the characters generated. 
 		if(pClass == "Barbarian"){
 			int index = abilityScores.indexOf(Collections.max(abilityScores));
 			strength = abilityScores.get(index);
@@ -599,10 +563,16 @@ public class Character {
 	
 	/*
 	 * Calculates the modifiers for each ability score. Affects how well you perform skills that correspond to the appropriate ability.
+	 * These skills are stored in alphabetical order in the Array skillProfs. For instance, skillProfs[0] = Acrobatics, skillProf[1] = Animal Handling, and so forth.
+	 * Look for the remaining skills on the 5e character sheet. How well you perform each of these skills is affected by your ability score modifiers. For instance, 
+	 * if you have to make a persuasion check DC 25, you would roll a D20 and add your ability modifier that corresponds with that skill. A persuasion check uses Charisma.
+	 * So, that means if your charisma score is a 16, you can add +3 to your roll to complete the check. 
 	 */
 	public void setModifiers() {
+		//Create easy reference to ability scores
 		int[] abilityScores = new int[] {strength, dexterity, constitution, intelligence, wisdom, charisma};
-		int[] abilityModifiers = new int[] {STRmod, DEXmod, CONmod, INTmod, WISmod, CHRmod};
+		//create an array of 6 empty values
+		int[] abilityModifiers = new int[] {0,0,0,0,0,0};
 		
 		for(int n = 0; n < 6; n++) {
 			int score = abilityScores[n];		//Create a reference to the ability score outside the array
@@ -625,7 +595,7 @@ public class Character {
 				abilityModifiers[n] = 4;
 			}
 		}
-		
+		//store the results from the array in the same order as abilityScores
 		STRmod = abilityModifiers[0];
 		DEXmod = abilityModifiers[1];
 		CONmod = abilityModifiers[2];
@@ -635,13 +605,20 @@ public class Character {
 	}
 	
 	/*
-	 * picks a random race for the character object and adjusts ability scores, sets speed and size
+	 * Picks a random race for your character from the 5 current options. After you select a race, add any given features, languages, and ability score bonuses that
+	 * come with that race. Also set the size and speed value, which is derived from the race of the player. 
+	 * NOTE: There is currently no option to employ the variant feature in the human class, which instead of getting +1 to all ability scores, to choose an extra 
+	 * feat at level 1. This should be implemented. 
 	 */
 	public void getRandomRace() {
+		
+		//The string of current races that can be chosen.
 		String[] possibleRaces = new String[] {"Human", "Elf", "Dwarf", "Half Orc", "Half Elf"};
 		Random rand = new Random();
 		int i = rand.nextInt(5);
 		race = possibleRaces[i];
+		
+		//Based on what race you chose, gain bonus features, languages, and ability score improvements.
 		if(race == "Dwarf") {
 			size = "Medium";
 			strength = strength + 2;
@@ -650,6 +627,7 @@ public class Character {
 			languagesKnown.add("Common");
 			langAmount = langAmount + 2;
 		}
+		
 		if(race == "Elf") {
 			size = "Medium";
 			intelligence++;
@@ -658,6 +636,7 @@ public class Character {
 			languagesKnown.add("Common");
 			langAmount = langAmount + 2;
 		}
+		
 		if(race == "Half Orc") {
 			features.add("Darkvision");
 			features.add("Relentless Endurance(PHB 41)");
@@ -669,8 +648,9 @@ public class Character {
 			languagesKnown.add("Common");
 			languagesKnown.add("Orcish");
 			langAmount = langAmount + 2;
-			skillProfs[7] = 1;	//intimidation
+			skillProfs[7] = 1;	//Gain proficiency in intimidation
 		}
+		
 		if(race == "Human") {
 			strength++;
 			constitution++;
@@ -683,6 +663,7 @@ public class Character {
 			languagesKnown.add("Common");
 			langAmount = langAmount + 2;
 		}
+		
 		if(race == "Half Elf") {
 			features.add("Fey Ancestry(PHB 39)");
 			size = "Medium";
@@ -697,6 +678,8 @@ public class Character {
 	
 	/*
 	 * picks a random name for the character, subject to race and gender. Surnames are genderless.
+	 * NOTE: At the beginning of the function call, you initialize each different array for all possibilities of gender and race. Maybe placing the arrays inside each 
+	 * if statement would help increase performance since you won't have to call each giant array of names that you won't end up using anyways.
 	 */
 	public void getRandomName() {
 		String[] maleHumanNames = new String[] {"Axel", "Ander", "Adam", "Bernard", "Bertram", "Chen", "Diggery", "Dante", "Evendur", "Francis", "Gilbert",
@@ -841,68 +824,139 @@ public class Character {
 	
 	/*
 	 * Alignments that are good have a higher representation because of the innate nature of DnD PCs. 
-	 * Evil characters are just all around less common so will be less highly selected
+	 * It is hard for a DnD party to get along and work together if characters are at odds with each when making tough decisions. So, this function chooses characters
+	 * with more often than not good alignments because those are the types of people that players want to play. Chaotic good and Lawful Neutral has the highest 
+	 * Percentage chance at 20%, with Lawful Good and Neutral Good at 15%.
 	 */
 	public void getRandomAlignment() {
 		Random rand = new Random();
-		int choice  = 1 + rand.nextInt(100);
-		if(choice > 0 && choice < 16) {
+		int choice  = 1 + rand.nextInt(100);	//pick a number between 1 and 100. Like rolling a D100
+		if(choice > 0 && choice < 16) {			//1-15
 			alignment = "Lawful Good";
 		}
-		if(choice > 15 && choice < 26) {
+		if(choice > 15 && choice < 31) {		//16-30
 			alignment = "Neutral Good";
 		}
-		if(choice > 25 && choice < 41) {
+		if(choice > 30 && choice < 51) {		//31-50
 			alignment = "Chaotic Good";
 		}
-		if(choice > 40 && choice < 56) {
+		if(choice > 50 && choice < 71) {		//51-70
 			alignment = "Lawful Neutral";
 		}
-		if(choice > 56 && choice < 66) {
+		if(choice > 70 && choice < 81) {		//71-80
 			alignment = "True Neutral";
-		}
-		if(choice > 65 && choice < 81) {
+		}	
+		if(choice > 80 && choice < 91) {		//81-90
 			alignment = "Chaotic Neutral";
 		}
-		if(choice > 80 && choice < 91) {
+		if(choice > 90 && choice < 96) {		//91-95
 			alignment = "Lawful Evil";
 		}
-		if(choice > 90 && choice < 99) {
+		if(choice > 95 && choice < 99) {		//96-98
 			alignment = "Neutral Evil";
 		}
-		if(choice == 99 || choice == 100) {
+		if(choice == 99 || choice == 100) {		//99-100
 			alignment = "Chaotic Evil";
 		}
 	}
 	
 	/*
-	 * picks a random class for the character
+	 * Picks a random class for the character. This function should contain all the features that are given to a character when they choose their class. 
+	 * NOTE: Currently there is nowhere in this program that adds any class-specific features to the character. This should be the function where we add that stuff 
+	 * to the characterObject. I will write a sample part of the code for the Fighter class, and will need help adding the rest. 
+	 * SUPER IMPORTANT NOTE: This program makes LEVEL 1 CHARACTERS FOR NOW. HOWEVER, it would be extremely helpful to write code that can be flexible and work by testing
+	 * what level the character is and adding extra features based on level. I will do my best to show what I am talking about in the example code
 	 */
 	public void getRandomClass() {
 		String[] possibleClasses = new String[] {"Barbarian", "Bard", "Cleric", "Druid", "Fighter", "Monk", "Paladin"," Rogue", "Ranger", "Sorcerer", "Warlock", "Wizard"};
 		Random rand = new Random();
 		int chosenClass = rand.nextInt(12);
 		pClass = possibleClasses[chosenClass];
+		
+		//EXAMPLE CODE
+		if(pClass == "Fighter") {
+			this.computeHP();						//Compute the HP now 
+			proficiencies.add("Light Armor");		//Add all weapon, armor and tool proficiencies to the ArrayList proficiencies.
+			proficiencies.add("Medium Armor");		//Please remember that these types of proficiencies are different than skill proficiencies
+			proficiencies.add("Heavy Armor");
+			proficiencies.add("Shields");
+			proficiencies.add("Simple Weapons");
+			proficiencies.add("Martial Weapons");
+			
+			abilitySavingThrows[0] = 1;				//Proficient in strength and constitution saving throws
+			abilitySavingThrows[2] = 1;				
+			
+			//Gain two random skills among Acrobatics, Animal Handling, Athletics, History, Insight, Intimidation, Perception, and Survival.
+			int[] possibleSkills = {0, 1, 3, 5, 6, 7, 11, 17};
+			int choice1 = rand.nextInt(8);			//See explanation for skillProfs if confused why these numbers were chosen for possibleSkills. these are the indices
+			int choice2 = rand.nextInt(8);			//of the skills listed in the above comment in the skillProfs array
+			while(choice1 == choice2) {				//If choices are the same skill, choose again till choices are different
+				choice2 = rand.nextInt(8);
+			}
+			skillProfs[choice1] = 1;				//Assign those skills
+			skillProfs[choice2] = 1;
+			
+			//Now, give your character equipment based on the PHB starting gear per the class
+			
+			//Chain mail or leather armor, longbow and 20 arrows. 
+			int equipementChoice1 = rand.nextInt(2);
+			if (equipementChoice1 == 0) {
+				armor = "Chain Mail";
+			}
+			else {
+				armor = "Leather armor";
+				weapons.add("Longbow");
+				inventory.add("Arrows 20x");
+			}
+			
+			//A martial weapon and a shield or two martial weapons
+			int equipmentChoice2 = rand.nextInt(2);
+			if(equipmentChoice2 == 0) {
+				weapons.add(getRandomMeleeMartialWeapon());
+				shield = true;
+			}
+			else {
+				weapons.add(getRandomMeleeMartialWeapon());
+				weapons.add(getRandomMeleeMartialWeapon());
+			}
+			
+			//A light crossbow and 20 bolts or two handaxes
+			int equipmentChoice3 = rand.nextInt(2);
+			if(equipmentChoice3 == 0) {
+				weapons.add("Light Crossbow");
+				inventory.add("Bolts 20x");
+			}
+			else {
+				weapons.add("Handaxe");
+				weapons.add("Handaxe");
+			}
+			
+			//A dungeoneer's pack or an adventurer's pack
+			int equipmentChoice4 = rand.nextInt(2);
+			if(equipmentChoice4 == 0) {
+				gainDungeoneersPack();
+			}
+			else {
+				gainExplorersPack();
+			}
+			
+			//At level 1, fighters choose a fighting style that defines the type of combat they excel in. Choose a random fighting style
+			String[] possibleFightingStyles = {"Archery", "Defense", "Dueling", "Great Weapon Fighting", "Protection", "Two Weapon Fighting"};
+			int styleChoice = rand.nextInt(6);
+			fightingStyle = possibleFightingStyles[styleChoice];
+			
+			//Also gain the feature second wind at level 1
+			features.add("Second Wind(PHB 72)");
+		}
 	}
 	
-	/*
-	 * Fills out the features ArrayList for a level 1 character
-	 */
-	public void computeFeatures() {
-		if(pClass == "Fighter") {
-			
-		}
-		if(pClass == "Ranger") {
-			
-		}
-		if(pClass == "Wizard") {
-			
-		}
-	}
 
 	/********************************************
 	 ************  Helper functions	*************			
 	 *******************************************/
+	//When a feature is invoked enough times, it becomes more convenient to create a seperate method for it and call it whenever it is needed. Many of the classes gain
+	//a random weapon when they start, so it is more consistent to create the method once rather than hard code it in the main method. These are what those functions
+	//are. The names are self-explanatory and should be pretty straightforward.  
 	
 	private static String getRandomInstrument() {
 		String[] possibleInstruments = {"Bagpipes", "Drum", "Dulcimer", "Flute", "Lute", "Lyre", "Horn", "Pan Flute", "Shawm", "Viol"};
@@ -957,7 +1011,8 @@ public class Character {
 	}
 	
 	private static String getRandomTrinket() {
-		return null;
+		//TO-DO 
+		//Table found in PHB 160 - 161
 	}
 	
 	private void gainProficiencyInRandomSkill() {
@@ -970,6 +1025,57 @@ public class Character {
 		skillProfs[choice] = 1;
 	}
 	
+	private void gainDungeoneersPack() {
+		String[] dungeoneersPack = {"backpack", "crowbar", "hammer", "pitons 10x", "torches 10x", "tinderbox", "daily ration 10x", "waterskin", "50 ft of rope"};
+		for(int n = 0; n < dungeoneersPack.length; n++) {
+			inventory.add(dungeoneersPack[n]);
+		}
+	}
+	
+	private void gainBurglarsPack() {
+		String[] burglarsPack = {"backpack", "bag of 1000 ball bearings", "10 feet of string", "bell", "candle 5x", "crowbar", "hammer", "pitons 10x", 
+				"hooded lantern", "flask of oil 2x", "daily ration 5x", "tinderbox", "waterskin", "50 ft of rope"};
+		for(int n = 0; n < burglarsPack.length; n++) {
+			inventory.add(burglarsPack[n]);
+		}
+	}
+	
+	private void gainDiplomatsPack() {
+		String[] diplomatsPack = {"small chest", "scroll case 2x", "set of fine clothes", "ink bottle", "ink pen", "lamp", "Flask of oil 2x", "sheet of paper 5x",
+				"perfume vial", "sealing wax", "soap"};
+		for(int n = 0; n < diplomatsPack.length; n++) {
+			inventory.add(diplomatsPack[n]);
+		}
+	}
+	
+	private void gainEntertainersPack() {
+		String[] entertainersPack = {"backpack", "bedroll", "costume 2x", "candle 5x", "daily ration 5x", "waterskin", "Disguise kit"};
+		for(int n = 0; n < entertainersPack.length; n++) {
+			inventory.add(entertainersPack[n]);
+		}
+	}
+	
+	private void gainExplorersPack() {
+		String[] explorersPack = {"backpack", "bedroll", "mess kit", "tinderbox", "torch 10x", "daily ration 10x", "waterskin", "50 ft of rope"};
+		for(int n = 0; n < explorersPack.length; n++) {
+			inventory.add(explorersPack[n]);
+		}
+	}
+	
+	private void gainPriestsPack() {
+		String[] priestsPack = {"Backpack", "blanket", "candle 10x", "tinderbox", "alms box", "block of incense 2x", "censer", "vestments", "daily ration 2x",
+		"waterskin"};
+		for(int n = 0; n < priestsPack.length; n++) {
+			inventory.add(priestsPack[n]);
+		}
+	}
+	
+	private void gainScholarsPack() {
+		String[] scholarsPack = {"Backpack", "book of lore", "ink bottle", "ink pen", "sheet of paper 10x", "small bag of sand", "small knife"};
+		for(int n = 0; n < scholarsPack.length; n++) {
+			inventory.add(scholarsPack[n]);
+		}
+	}
 	/********************************************
 	 ************ 	Get functions	*************			
 	 *******************************************/
