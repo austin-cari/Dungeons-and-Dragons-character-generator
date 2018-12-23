@@ -69,8 +69,9 @@ public class Character {
 	int[] currency = {0,0,0};				//currency[0] = copper coins, currency [1] = silver coins, etc...
 	
 	//Spells and stuff
-	ArrayList<String> firstLevelSpells = new ArrayList<String>();		//need to implement
-	int firstLevelSpellSlots;											//need to implement
+	ArrayList<String> firstLevelSpells = new ArrayList<String>();		
+	ArrayList<String> cantrips = new ArrayList<String>();
+	int firstLevelSpellSlots;											
 	
 	
 	//class specific archetypes. Null if non applicable
@@ -88,7 +89,17 @@ public class Character {
 	 */
 	public Character() {
 			
-		//set any class/background-specific parameters to empty strings;
+		//set all fields to empty string or zero
+		name = "";
+		surname = "";
+		pClass = "";
+		gender = "";
+		alignment = "";
+		background = "";
+		HP = 0;
+		size = "";
+		speed = 0;
+		passiveWis = 0;
 		this.clericDomain = "";
 		this.fightingStyle = "";
 		this.favoredEnemy = "";
@@ -109,7 +120,7 @@ public class Character {
 		this.getRandomName();
 		this.getRandomBackground();
 		this.getRandomAlignment();
-		
+		this.computeAC();
 	}
 
 	/*
@@ -207,7 +218,7 @@ public class Character {
 			features.add("False Identity(PHB 128)");
 			skillProfs[4] = 1;	//deception
 			skillProfs[15] = 1;	//sleight of hand
-			inventory.add("a set of fine clothes");
+			inventory.add("set of fine clothes");
 			inventory.add("Disguise kit");
 			int conOfChoice = rand.nextInt(3);
 			if(conOfChoice == 0) {
@@ -345,6 +356,57 @@ public class Character {
 			HP = 6 + CONmod;
 		}
 		
+	}
+	
+	public void computeAC() {
+		if(armor.equals("Common Robes") || armor.equals("Common Clothes")) {
+			AC = 10;
+		}
+		if(armor.equals("Padded Armor") || armor.equals("Leather Armor")) {
+			AC = 11 + DEXmod;
+		}
+		if(armor.equals("Studded Leather")) {
+			AC = 12 + DEXmod;
+		}
+		if(armor.equals("Hide Armor")) {
+			if(DEXmod >= 2) {
+				AC = 12 + 2;
+			}
+			else {AC = 12 + DEXmod;}
+		}
+		if(armor.equals("Chain Shirt")){
+			if(DEXmod >= 2) {
+				AC = 13 + 2;
+			}
+			else {AC = 13 + DEXmod;}
+		}
+		if(armor.equals("Scale Mail") || armor.equals("Breastplate")) {
+			if(DEXmod >= 2) {
+				AC = 14 + 2;
+			}
+			else {AC = 14 + DEXmod;}
+		}
+		if(armor.equals("Half Plate")) {
+			if(DEXmod >= 2) {
+				AC = 15 + 2; 
+			}
+			else {AC = 15 + DEXmod;}
+		}
+		if(armor.equals("Ring Mail")) {
+			AC = 14;
+		}
+		if(armor.equals("Chain Mail")) {
+			AC = 16;
+		}
+		if(armor.equals("Splint Mail")) {
+			AC = 17;
+		}
+		if(armor.equals("Plate Mail")){
+			AC = 18;
+		}
+		if(shield == true) {
+			AC = AC + 2;
+		}
 	}
 
 	/*
@@ -882,7 +944,7 @@ public class Character {
 		Random rand = new Random();
 		int chosenClass = rand.nextInt(12);
 		pClass = possibleClasses[chosenClass];
-		
+
 		//EXAMPLE CODE
 		if(pClass == "Fighter") {
 			if(level > 0) {
@@ -904,52 +966,39 @@ public class Character {
 				while(choice1 == choice2) {				//If choices are the same skill, choose again till choices are different
 					choice2 = rand.nextInt(8);
 				}
-					skillProfs[choice1] = 1;				//Assign those skills
-				skillProfs[choice2] = 1;
+				skillProfs[possibleSkills[choice1]] = 1;				//Assign those skills
+				skillProfs[possibleSkills[choice2]] = 1;
 			
 				//Now, give your character equipment based on the PHB starting gear per the class
 			
 				//Chain mail or leather armor, longbow and 20 arrows. 
 				int equipementChoice1 = rand.nextInt(2);
-				if (equipementChoice1 == 0) {
-					armor = "Chain Mail";
-				}
+				if (equipementChoice1 == 0) {armor = "Chain Mail";}
 				else {
 					armor = "Leather armor";
 					weapons.add("Longbow");
-					inventory.add("Arrows 20x");
-				}
+					inventory.add("Arrows 20x");}
 				
 				//a martial weapon and a shield or two martial weapons
 				int equipmentChoice2 = rand.nextInt(2);
 				if(equipmentChoice2 == 0) {
 					weapons.add(getRandomMeleeMartialWeapon());
-					shield = true;
-				}
+					shield = true;}
 				else {
 					weapons.add(getRandomMeleeMartialWeapon());
-					weapons.add(getRandomMeleeMartialWeapon());
-				}
+					weapons.add(getRandomMeleeMartialWeapon());}
 				
 				//a light crossbow and 20 bolts or two handaxes
 				int equipmentChoice3 = rand.nextInt(2);
 				if(equipmentChoice3 == 0) {
 					weapons.add("Light Crossbow");
-					inventory.add("Bolts 20x");
-				}
-				else {
-					weapons.add("Handaxe");
-					weapons.add("Handaxe");
-				}
+					inventory.add("Bolts 20x");}
+				else {weapons.add("Handaxes 2x");}
 				
 				//a dungeoneer's pack or an adventurer's pack
 				int equipmentChoice4 = rand.nextInt(2);
-				if(equipmentChoice4 == 0) {
-					gainDungeoneersPack();
-				}
-				else {
-					gainExplorersPack();
-				}
+				if(equipmentChoice4 == 0) {gainDungeoneersPack();}
+				else {gainExplorersPack();}
 				
 				//At level 1, fighters choose a fighting style that defines the type of combat they excel in. Choose a random fighting style
 				String[] possibleFightingStyles = {"Archery", "Defense", "Dueling", "Great Weapon Fighting", "Protection", "Two Weapon Fighting"};
@@ -958,6 +1007,104 @@ public class Character {
 				
 				//Also gain the feature second wind at level 1
 				features.add("Second Wind(PHB 72)");
+			}
+		}
+		
+		if(pClass == "Barbarian") {
+			if(level > 0) {
+				this.computeHP();
+				proficiencies.add("Light Armor");
+				proficiencies.add("Medium Armor");
+				proficiencies.add("Shields");
+				proficiencies.add("Simple Weapons");
+				proficiencies.add("Martial Weapons");
+				
+				abilitySavingThrows[0] = 1;
+				abilitySavingThrows[2] = 1;
+				
+				//Gain two random skills among Animal Handling, Athletics, Intimidation, Nature, Perception, Survival
+				int[] possibleSkills = {1, 3, 7, 10, 11, 17};
+				int choice1 = rand.nextInt(6);			
+				int choice2 = rand.nextInt(6);			
+				while(choice1 == choice2) {				
+					choice2 = rand.nextInt(8);
+				}
+				skillProfs[possibleSkills[choice1]] = 1;				
+				skillProfs[possibleSkills[choice2]] = 1;
+				
+				//Equipment
+				
+				armor = "Studded Leather";
+				
+				//a greataxe or any martial melee weapon
+				int equipmentChoice1 = rand.nextInt(2);
+				if(equipmentChoice1 == 0) {weapons.add("Greataxe");}
+				else {getRandomMeleeMartialWeapon();}
+				
+				//two handaxes or any simple weapon
+				int equipmentChoice2 = rand.nextInt(2);
+				if(equipmentChoice2 == 0){weapons.add("Handaxes 2x");}
+				else {getRandomMeleeSimpleWeapon();}
+				
+				//an explorers pack and 4 javelins
+				weapons.add("Javelins 4x");
+				gainExplorersPack();
+				
+				features.add("Rage (PHB 48)");
+				features.add("Unarmored Defense (PHB 48)");
+			}
+		}
+		
+		if(pClass == "Wizard") {
+			if(level > 0) {
+				this.computeHP();
+				proficiencies.add("Daggers");
+				proficiencies.add("Darts");
+				proficiencies.add("Slings");
+				proficiencies.add("Quaterstaffs");
+				proficiencies.add("Light Crossbow");
+				
+				abilitySavingThrows[3] = 1;
+				abilitySavingThrows[4] = 1;
+				
+				//Gain two random skills among Arcana, History, Insight, Investigation, Medicine, and Religion
+				int[] possibleSkills = {2, 5, 6, 8, 9, 14};
+				int choice1 = rand.nextInt(6);			
+				int choice2 = rand.nextInt(6);			
+				while(choice1 == choice2) {				
+					choice2 = rand.nextInt(8);
+				}
+				skillProfs[possibleSkills[choice1]] = 1;				
+				skillProfs[possibleSkills[choice2]] = 1;
+				
+				//Equipment
+				
+				armor = "Common robes";
+				
+				//a quarterstaff or a dagger
+				int equipmentChoice1 = rand.nextInt(2);
+				if(equipmentChoice1 == 0) {weapons.add("Quarterstaff");}
+				else {weapons.add("Dagger");}
+				
+				//A component pouch or an arcane focus
+				int equipmentChoice2 = rand.nextInt(2);
+				if(equipmentChoice2 == 0) {inventory.add("component pouch");}
+				else {inventory.add("arcane focus");}
+				
+				//a scholar's pack or an explorer's pack
+				int equipmentChoice3 = rand.nextInt(2);
+				if(equipmentChoice3 == 0) {gainScholarsPack();}
+				else {gainExplorersPack();}
+				
+				//a spellbook
+				inventory.add("spellbook");
+				
+				//As a 1st level wizard, you know 6 level 1 spells and 3 cantrips
+				getRandomMageSpells(6);
+				getRandomMageCantrips(3);
+				firstLevelSpellSlots = 2;
+				
+				features.add("Arcane Recovery (PHB 115)");
 			}
 		}
 	}
@@ -1086,6 +1233,55 @@ public class Character {
 		String[] scholarsPack = {"Backpack", "book of lore", "ink bottle", "ink pen", "sheet of paper 10x", "small bag of sand", "small knife"};
 		for(int n = 0; n < scholarsPack.length; n++) {
 			inventory.add(scholarsPack[n]);
+		}
+	}
+	
+	private void getRandomMageSpells(int numberOfSpells) {
+		String[] mageSpellsLevelOne = {"Alarm", "Burning Hands", "Charm Person", "Chromatic Orb", "Color Spray", "Comprehend Languages", "Detect Magic", "Disguise Self", 
+								"Expeditious Retreat", "False Life", "Feather Fall", "Find Familiar", "Fog Cloud", "Grease", "Identify", "Illusory Script", "Jump",
+								"Longstrider", "Mage Armor", "Magic Missile", "Profection from Evil and Good", "Ray of Sickness", "Shield", "Silent Image", "Sleep", 
+								"Tasha's Hideous Laughter", "Tenser's Floating Disk", "Thunderwave", "Unseen Servant", "Witch Bolt"};
+		
+		ArrayList<Integer> choices = new ArrayList<Integer>();
+		for(int n = 0; n < numberOfSpells; n++) {
+			Random rand = new Random();
+			int choice = rand.nextInt(mageSpellsLevelOne.length);
+			choices.add(choice);
+			//make sure the newest choice is not the same as any previous one
+			for(int g = 0; g < n; g++) {
+				while(choices.get(g) == choices.get(n)) {						//as long as elements n and g are equal to each other, keep choosing a different spell
+					int newChoice = rand.nextInt(mageSpellsLevelOne.length);
+					choices.set(n, newChoice);
+				}
+			}
+		}
+		
+		//Add each spell chosen from the possible list into your spellbook
+		for(int counter = 0; counter < choices.size(); counter++) {
+			firstLevelSpells.add(mageSpellsLevelOne[choices.get(counter)]);
+		}
+	}
+	
+	private void getRandomMageCantrips(int numberOfCantrips) {
+		String[] mageCantrips = {"Acid Splash", "Blade Ward", "Chill Touch", "Dancing Lights", "Fire Bolt", "Friends", "Light", "Mage Hand", "Mending", "Message", 
+								"Minor Illusion", "Poison Spray", "Prestidigation", "Ray of Frost", "Shocking Grasp", "True Strike"};
+		ArrayList<Integer> choices = new ArrayList<Integer>();
+		for(int n = 0; n < numberOfCantrips; n++) {
+			Random rand = new Random();
+			int choice = rand.nextInt(mageCantrips.length);
+			choices.add(choice);
+			//make sure the newest choice is not the same as any previous one
+			for(int g = 0; g < n; g++) {
+				while(choices.get(g) == choices.get(n)) {						//as long as elements n and g are equal to each other, keep choosing a different spell
+					int newChoice = rand.nextInt(mageCantrips.length);
+					choices.set(n, newChoice);
+				}
+			}
+		}
+		
+		//Add each spell chosen from the possible list into your spellbook
+		for(int counter = 0; counter < choices.size(); counter++) {
+			cantrips.add(mageCantrips[choices.get(counter)]);
 		}
 	}
 	/********************************************
