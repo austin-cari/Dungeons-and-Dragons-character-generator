@@ -23,8 +23,11 @@ public class CharacterGenerator {
 	 * @param args The command line arguments.
 	 * @throws FileNotFoundException Files used do not exists. Only hit this 
 	 * point if the user inputs a non-existing file name.
+	 * @throws FileDataException The data in the file does not follow the 
+	 * correct format
 	 */
-	public static void main(String[] args) throws FileNotFoundException {
+	public static void main(String[] args) throws FileNotFoundException, 
+			FileDataException {
 		
 		// Default file names.
 		String[] fileNames = {"names.txt", "equipment.txt"};
@@ -56,10 +59,10 @@ public class CharacterGenerator {
 				+ "\n0 = no, 1 = yes");
 		int response = c.nextInt();
 		if(response != 1) {
-			System.out.print("Please input the .txt file with the new list "
+			System.out.print("Please input the file with the new list "
 					+ "of names: ");
 			f[0] = c.next();
-			System.out.print("Please input the .txt file with the new list "
+			System.out.print("Please input the file with the new list "
 					+ "of equipment: ");
 			f[1] = c.next();
 		}

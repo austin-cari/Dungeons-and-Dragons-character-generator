@@ -13,31 +13,26 @@ public class NameHolder {
     Map<String,Map<String, ArrayList<String>>> names;
     Map<String, ArrayList<String>> surnames;
 
-    public class FileDataException extends Exception {
-        public FileDataException(String s) {
-            super(s);
-        }
-    }
-
 	/**
 	 *
 	 * @param fileName The file name that will be processed.
-	 * @throws FileNotFoundException
+	 * @throws FileNotFoundException File that was passed did not exist.
+	 * @throws FileDataException  Data in the file is not formatted correctly.
 	 */
-	public NameHolder(String fileName) throws FileNotFoundException,
-            FileDataException {
+	public NameHolder(String fileName) throws FileNotFoundException, 
+			FileDataException {
 		File f = new File(fileName);
-
+		
 		// Check if file exists.
 		if(!f.isFile()) {
 			throw new FileNotFoundException("File does not exist");
 		}
-
-        // Initialize data structures
-        names = new HashMap<String, Map<String, ArrayList<String>>>();
-        surnames = new HashMap<String, ArrayList<String>>();
-        Scanner process = new Scanner(f);
-        processing(process);
+		
+		// Initialize data structures
+		names = new HashMap<String, Map<String, ArrayList<String>>>();
+		surnames = new HashMap<String, ArrayList<String>>();
+		Scanner process = new Scanner(f);
+		processing(process);
 	}
 
     public void processing(Scanner process) throws FileDataException {
