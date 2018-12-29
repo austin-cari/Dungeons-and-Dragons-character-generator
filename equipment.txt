@@ -1,0 +1,139 @@
+# Default equipment file that contains data about a characters pack, or
+# potential weapons.
+================================================================================
+Pack: Dungeoneer
+--------------------------------------------------------------------------------
+backpack
+crowbar
+hammer
+pitons 10x
+torches 10x
+tinderbox
+daily ration 10x
+waterskin
+50 ft of rope
+================================================================================
+Pack: Burgler
+--------------------------------------------------------------------------------
+backpack
+bag of 1000 ball bearings
+10 feet of string
+bell
+candle 5x
+crowbar
+hammer
+pitons 10x
+hooded lantern
+flask of oil 2x
+daily ration 5x
+tinderbox
+waterskin
+50 ft of rope
+================================================================================
+Pack: Diplomat
+--------------------------------------------------------------------------------
+small chest
+scroll case 2x
+set of fine clothes
+ink bottle
+ink pen
+lamp
+Flask of oil 2x
+sheet of paper 5x
+perfume vial
+sealing wax
+soap
+================================================================================
+Pack: Entertainer
+--------------------------------------------------------------------------------
+backpack
+bedroll
+costume 2x
+candle 5x
+daily ration 5x
+waterskin
+Disguise kit
+================================================================================
+Pack: Explorer
+--------------------------------------------------------------------------------
+backpack
+bedroll
+mess kit
+tinderbox
+torch 10x
+daily ration 10x
+waterskin
+50 ft of rope
+================================================================================
+Pack: Priest
+--------------------------------------------------------------------------------
+Backpack
+blanket
+candle 10x
+tinderbox
+alms box
+block of incense 2x
+censer
+vestments
+daily ration 2x
+waterskin
+================================================================================
+Pack: Scholar
+--------------------------------------------------------------------------------
+Backpack
+book of lore
+ink bottle
+ink pen
+sheet of paper 10x
+small bag of sand
+small knife
+================================================================================
+Weapon: Melee Martial
+--------------------------------------------------------------------------------
+Battleaxe
+Flail
+Glaive
+Greataxe
+Greatsword
+Halbred
+Lance
+Longsword
+Maul
+Morningstar
+Pike
+Rapier
+Scimitar
+Shortsword
+Trident
+War pick
+Warhammer
+Whip
+================================================================================
+Weapon: Melee Simple
+--------------------------------------------------------------------------------
+Club
+Dagger
+Greatclub
+Handaxe
+Javelin
+Light Hammer
+Mace
+Quarterstaff
+Sickle
+Spear
+================================================================================
+Weapon: Ranged Martial 
+--------------------------------------------------------------------------------
+Blowgun
+Hand crossbow
+Heavy Crossbow
+Longbow
+Net
+================================================================================
+Weapon: Ranged Simple
+--------------------------------------------------------------------------------
+Light crossbow
+Dart gun
+Shortbow
+Sling
+================================================================================
